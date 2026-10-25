@@ -1,7 +1,8 @@
 package ru.netology.pages;
 
-import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+import ru.netology.data.DataHelper;
 
 import java.time.Duration;
 
@@ -31,8 +32,18 @@ public class DashboardPage {
         return Integer.parseInt(value);
     }
 
-    public void chooseCard(int index) {
-        cards.get(index).$("[data-test-id='action-deposit']").click();
-        $("h1").shouldHave(Condition.text("Пополнение карты")).shouldBe(visible, Duration.ofSeconds(10));
+    public SelenideElement getCard(DataHelper.CardInfo cardInfo) {
+        int index = cardInfo.getIndex();
+        return cards.get(index);
+    }
+
+    public void checkCardBalance(DataHelper.CardInfo cardInfo, int expectedBalance) {
+        getCard(cardInfo).should(visible).should(text(balanceStart + expectedBalance + balanceFinish));
+    }
+
+    public void chooseCard(DataHelper.CardInfo cardInfo) {
+        getCard(cardInfo).$("[data-test-id='action-deposit']").click();
+        TopUpBalansePage topUpBalansePage = new TopUpBalansePage();
+        topUpBalansePage.checkPageVisible();
     }
 }

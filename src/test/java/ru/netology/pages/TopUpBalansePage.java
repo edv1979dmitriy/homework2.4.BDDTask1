@@ -1,7 +1,9 @@
 package ru.netology.pages;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.Keys;
+import ru.netology.data.DataHelper;
 
 import java.time.Duration;
 
@@ -16,6 +18,10 @@ public class TopUpBalansePage {
 
     private final SelenideElement amountField = $("[data-test-id='amount'] input");
     private final SelenideElement numberCardField = $("[data-test-id='from'] input");
+
+    public void checkPageVisible() {
+        $("h1").shouldHave(Condition.text("Пополнение карты")).shouldBe(visible, Duration.ofSeconds(10));
+    }
 
     public void transfer(String amount, String numberDebitCard) {
         amountField.click();
@@ -46,16 +52,17 @@ public class TopUpBalansePage {
         $("[data-test-id='error-notification'] .notification__content").shouldHave(text("Ошибка! "));
     }
 
-    public void returnOriginalState(DashboardPage card) {
-        int difference1 = 10_000 - card.getCardBalance(0);
-        int difference2 = 10_000 - card.getCardBalance(1);
+    public void returnOriginalState() {
+        DashboardPage card = new DashboardPage();
+        int difference1 = DataHelper.getCardInfo(0).getInitialbalance() - card.getCardBalance(0);
+        int difference2 = DataHelper.getCardInfo(1).getInitialbalance() - card.getCardBalance(1);
         if (difference1 >= 0) {
-            card.chooseCard(0);
-            transfer(Integer.toString(difference1), "5559 0000 0000 0002");
+            card.chooseCard(DataHelper.getCardInfo(0));
+            transfer(Integer.toString(difference1), DataHelper.getCardInfo(1).getNamberCard());
         }
         if (difference1 < 0) {
-            card.chooseCard(1);
-            transfer(Integer.toString(difference2), "5559 0000 0000 0001");
+            card.chooseCard(DataHelper.getCardInfo(1));
+            transfer(Integer.toString(difference2), DataHelper.getCardInfo(0).getNamberCard());
         }
         $("[data-test-id='action-reload']").click();
     }
