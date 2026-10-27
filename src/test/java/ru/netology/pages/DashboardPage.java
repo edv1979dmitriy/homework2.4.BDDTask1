@@ -41,9 +41,8 @@ public class DashboardPage {
         getCard(cardInfo).should(visible).should(text(balanceStart + expectedBalance + balanceFinish));
     }
 
-    public void chooseCard(DataHelper.CardInfo cardInfo) {
+    public TopUpBalansePage chooseCard(DataHelper.CardInfo cardInfo) {
         getCard(cardInfo).$("[data-test-id='action-deposit']").click();
-        TopUpBalansePage topUpBalansePage = new TopUpBalansePage();
-        topUpBalansePage.checkPageVisible();
+        return new TopUpBalansePage();
     }
 }
